@@ -1,0 +1,75 @@
+version: '3.4'
+
+services:
+
+  spark-master:
+    image: docker.io/bitnami/spark:3
+    environment:
+      - SPARK_MODE=master
+      - SPARK_RPC_AUTHENTICATION_ENABLED=no
+      - SPARK_RPC_ENCRYPTION_ENABLED=no
+      - SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED=no
+      - SPARK_SSL_ENABLED=no
+    expose:
+      - 7001
+      - 7002
+      - 7003
+      - 7004
+      - 7005
+      - 7006
+      - 7077
+      - 6066
+    ports:
+      - 4040:4040
+      - 6066:6066
+      - 7077:7077
+      - 8080:8080
+    volumes:
+      - ./services/spark/conf/master:/conf
+      - ./services/spark/data:/tmp/data
+
+  spark-worker:
+    image: docker.io/bitnami/spark:3
+    environment:
+      - SPARK_MODE=worker
+      - SPARK_MASTER_URL=spark://spark-master:7077
+      - SPARK_WORKER_MEMORY=4G
+      - SPARK_WORKER_CORES=1
+      - SPARK_RPC_AUTHENTICATION_ENABLED=no
+      - SPARK_RPC_ENCRYPTION_ENABLED=no
+      - SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED=no
+      - SPARK_SSL_ENABLED=no
+    expose:
+      - 7012
+      - 7013
+      - 7014
+      - 7015
+      - 7016
+      - 8881
+    volumes:
+      - ./services/spark/conf/worker:/conf
+      - ./services/spark/data:/tmp/data
+    links:
+      - spark-master
+    depends_on:
+      - spark-master
+
+  web:
+    container_name: web
+    image: web
+    build:
+      context: ./services/web
+      dockerfile: Dockerfile
+    volumes:
+      - './services/web/:/usr/src/app'
+    ports:
+      - 8050:8050
+    command: python app.py -h 0.0.0.0
+    environment:
+      - APP_SETTINGS=server.config.DevelopmentConfig
+    links:
+      - spark-master
+      - spark-worker
+    depends_on:
+      - spark-master
+      - spark-worker
