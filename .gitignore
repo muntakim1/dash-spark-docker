@@ -1,0 +1,6 @@
+postgres/
+*.csv
+.idea/
+services/web/venv
+services/web/.idea/
+services/web/.env.local

@@ -1,4 +1,4 @@
-version: '3.4'
+version: '3.9'
 
 services:
 
@@ -20,10 +20,10 @@ services:
       - 7077
       - 6066
     ports:
-      - 4040:4040
-      - 6066:6066
-      - 7077:7077
-      - 8080:8080
+      - "4040:4040"
+      - "6066:6066"
+      - "7077:7077"
+      - "8080:8080"
     volumes:
       - ./services/spark/conf/master:/conf
       - ./services/spark/data:/tmp/data
@@ -54,22 +54,50 @@ services:
     depends_on:
       - spark-master
 
+  nginx:
+    container_name: nginx
+    image: nginx
+    ports:
+      - "80:80"
+    links:
+      - "web"
+    volumes:
+      - './nginx/nginx.conf:/etc/nginx/nginx.conf'
+    
+
   web:
     container_name: web
     image: web
+    restart: always
     build:
       context: ./services/web
       dockerfile: Dockerfile
     volumes:
       - './services/web/:/usr/src/app'
-    ports:
-      - 8050:8050
-    command: python app.py -h 0.0.0.0
+    expose:
+      - 8000
+    # ports:
+    #   - "8000:8000"
+    # command: gunicorn main:server # production
+    command: python3 main.py # development
     environment:
       - APP_SETTINGS=server.config.DevelopmentConfig
+      - GUNICORN_CMD_ARGS="--bind=0.0.0.0 --workers=3"
     links:
       - spark-master
       - spark-worker
+      - db
     depends_on:
       - spark-master
       - spark-worker
+
+  db:
+    container_name: postgres
+    image: postgres:13
+    restart: always
+    environment:
+      - POSTGRES_PASSWORD=password
+    volumes:
+      - ./postgres/data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"

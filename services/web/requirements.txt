@@ -1,8 +1,11 @@
 dash
-dash-core-components
-dash-html-components
 dash-bootstrap-components
-pyspark
-pandas 
+gunicorn
+pycorn
+pandas
 numpy
-plotly
+pyspark
+psycopg2-binary
+pony
+sqlalchemy
+python-dotenv

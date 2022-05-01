@@ -1,6 +1,6 @@
 # dash-spark-docker
 
-Spark is a inmemory big data processing tool from apache. Spark is written in Scala. It can perform computation in distributed manner.
+Spark is a in-memory big data processing tool from apache. Spark is written in Scala. It can perform computation in distributed manner.
 PySpark is a framework or modules for python to work with Spark. We are using docker for creating a multicluster spark environment to process about 60M data to calculate median sales value
 from 30 years of sales. Those medians will be shown using dashplotly python framework for creating dashboards.
 

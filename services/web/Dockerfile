@@ -6,6 +6,8 @@ WORKDIR /usr/src/app
 
 RUN apt-get update \
     && apt-get install -y locales \
+    && apt-get install -y libpq-dev \
+    && apt-get install -y build-essential \
     && dpkg-reconfigure -f noninteractive locales \
     && locale-gen C.UTF-8 \
     && /usr/sbin/update-locale LANG=C.UTF-8 \
